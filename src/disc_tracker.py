@@ -45,20 +45,27 @@ class DiscTracker:
             contours, hierarchy = cv2.findContours(threshold, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
             # contours, _ = cv2.findContours(threshold, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             highestPoint, lowestPoint, leftmostPoint, rightmostPoint = self.findExtrema(contours, frame.shape)
+
             center_x = (leftmostPoint[0] + rightmostPoint[0]) // 2
             center_y = (highestPoint[1] + lowestPoint[1]) // 2
-            # print("left right", leftmostPoint, rightmostPoint)
             width = np.abs(rightmostPoint[0] - leftmostPoint[0])
             height = np.abs(lowestPoint[1] - highestPoint[1])
 
-            rects.append((center_x, center_y, width, height, i))
+            if not (rightmostPoint[0] >= frame.shape[1] - 1 or leftmostPoint[0] <= 1):
+                rects.append((center_x, center_y, width, height, i))
+                color = (255, 0, 0)
+            else:
+                color = (0, 0, 255)
 
             cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
-                        (center_x + width // 2, center_y + height // 2), (255, 0, 0), 2)
-            # cv2.imshow('threshold', threshold)
-            cv2.imshow('frame', frame)
-            # if cv2.waitKey(0) == ord('q'):
-            #     break
+                        (center_x + width // 2, center_y + height // 2), color, 2)
+
+            # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
+            if not leftmostPoint[0] >= rightmostPoint[0]:
+                # cv2.imshow('threshold', threshold)
+                cv2.imshow('frame', frame)
+                if cv2.waitKey(120) == ord('q'):
+                    break
         return rects
 
     def findDiscSpeed(self, discs):
