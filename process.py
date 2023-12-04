@@ -1,11 +1,48 @@
-import cv2 as cv
+import cv2
+import numpy as np
 import argparse
+from src import disc_tracker, perspective_calculator
 
-parser = argparse.ArgumentParser()
-parser.add_argument('video', help='path to input video file')
-parser.add_argument('--output', help='path to output video file (optional)')
-parser.add_argument('--calibration', default='iphone_calib.txt', help='path to calibration file')
-parser.add_argument('--ball_radius', type=float, default=27.305, help='radius of disc in cm')
-args = parser.parse_args()
 
-vid = cv.VideoCapture(args.video)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('video', help='path to input video file')
+    parser.add_argument('--output', help='path to output video file (optional)')
+    parser.add_argument('--calibration', default='data/calib.txt', help='path to calibration file')
+    parser.add_argument('--disc_radius', type=float, default=27.305, help='radius of disc in cm')
+    args = parser.parse_args()
+
+    vid = cv2.VideoCapture(args.video)
+
+    frames = []
+
+    while vid.isOpened():
+        ret, frame = vid.read()
+        if not ret:
+            break
+
+        frames.append(frame)
+
+        # cv2.imshow('frame',frame)
+        # if cv2.waitKey(5) == ord('q'):
+        #     break
+
+    frames = np.array(frames)
+    vid.release()
+
+    # for frame in frames[:30]:
+    #     persp = perspective_calculator.PerspectiveCalculator(args.calibration, args.disc_radius)
+    #     persp.process_frame(frame)
+    #     cv2.imshow('frame', frame)
+    #     if cv2.waitKey(60) == ord('q'):
+    #         break
+
+
+    lastHalf = frames[len(frames)//2:]
+    leftHalf = [frame[:, :frame.shape[1]//2] for frame in lastHalf]
+    discTracker = disc_tracker.DiscTracker(leftHalf)
+    background = discTracker.findBackground()
+    discs = discTracker.findDisc(background)
+
+if __name__ == '__main__':
+    main()
