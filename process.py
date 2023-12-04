@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import argparse
-from src import disc_tracker, perspective_calculator
+from src import disc_tracker, perspective_calculator, functions
 
 
 def main():
@@ -9,8 +9,11 @@ def main():
     parser.add_argument('video', help='path to input video file')
     parser.add_argument('--output', help='path to output video file (optional)')
     parser.add_argument('--calibration', default='data/calib.txt', help='path to calibration file')
-    parser.add_argument('--disc_radius', type=float, default=27.305, help='radius of disc in cm')
+    parser.add_argument('--disc_radius', type=float, default=13.6525, help='radius of disc in cm')
+    parser.add_argument('--fps', type=int, default=60, help='frames per second of video')
     args = parser.parse_args()
+
+    radius = args.disc_radius / 100
 
     vid = cv2.VideoCapture(args.video)
 
@@ -30,19 +33,26 @@ def main():
     frames = np.array(frames)
     vid.release()
 
-    # for frame in frames[:30]:
-    #     persp = perspective_calculator.PerspectiveCalculator(args.calibration, args.disc_radius)
-    #     persp.process_frame(frame)
-    #     cv2.imshow('frame', frame)
-    #     if cv2.waitKey(60) == ord('q'):
-    #         break
+    ratios = []
+    for frame in frames[:args.fps//2]:
+        perspective = perspective_calculator.PerspectiveCalculator(radius)
+        ratios.append(perspective.process_frame(frame))
+        # cv2.imshow('frame', frame)
+        # if cv2.waitKey(60) == ord('q'):
+        #     break
+
+    ratio = np.mean(functions.remove_outliers(ratios))
+    print("RATIO:", ratio)
 
 
     lastHalf = frames[len(frames)//2:]
     leftHalf = [frame[:, :frame.shape[1]//2] for frame in lastHalf]
-    discTracker = disc_tracker.DiscTracker(leftHalf)
+    discTracker = disc_tracker.DiscTracker(leftHalf, ratio, args.fps)
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
+    speed = discTracker.findDiscSpeed(discs)
+    print(f"Speed = {speed}m/s")
+
 
 if __name__ == '__main__':
     main()

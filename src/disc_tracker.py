@@ -1,12 +1,15 @@
 import cv2
 import numpy as np
 from time import sleep
+import src.functions as functions
 
 class DiscTracker:
 
-    def __init__(self, videoFrames):
+    def __init__(self, videoFrames, pixelToRealRatio, fps):
         self.frames = videoFrames[:]
-        pass
+        self.pixelToRealRatio = pixelToRealRatio
+        self.fps = fps
+        self.frameShape = self.frames[0].shape
 
     def findBackground(self):
         grayFrames = []
@@ -24,28 +27,17 @@ class DiscTracker:
 
         for contour in contours:
             for point in contour[:, 0]:
-                # Find minimum point
                 if point[1] < highestPoint[1]: highestPoint = point
-                # highestPoint = (min(highestPoint[0], point[0]), min(highestPoint[1], point[1]))
-
-                # Find maximum point
                 if point[1] > lowestPoint[1]: lowestPoint = point
-                # lowestPoint = (max(lowestPoint[0], point[0]), max(lowestPoint[1], point[1]))
-
-                # Find rightmost point
                 if point[0] > rightmostPoint[0]: rightmostPoint = point
-                # rightmostPoint = max(leftmostPoint, tuple(point), key=lambda x: x[0])
-
-                # Find leftmost point
                 if point[0] < leftmostPoint[0]: leftmostPoint = point
-                # leftmostPoint = min(leftmostPoint, tuple(point), key=lambda x: x[0])
         return (highestPoint, lowestPoint, leftmostPoint, rightmostPoint)
 
 
 
     def findDisc(self, background):
         rects = []
-        for frame in self.frames:
+        for i, frame in enumerate(self.frames):
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             image_blur = cv2.GaussianBlur(gray, (9,9), 2)
             absoluteDif = cv2.absdiff(image_blur, background)
@@ -59,18 +51,34 @@ class DiscTracker:
             width = np.abs(rightmostPoint[0] - leftmostPoint[0])
             height = np.abs(lowestPoint[1] - highestPoint[1])
 
-            rects.append(center_x, center_y, width, height)
+            rects.append((center_x, center_y, width, height, i))
 
-            # cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
-            #             (center_x + width // 2, center_y + height // 2), (255, 0, 0), 2)
-            # # cv2.imshow('threshold', threshold)
-            # cv2.imshow('frame', frame)
-            # sleep(0.1)
-            # if cv2.waitKey(1) == ord('q'):
+            cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
+                        (center_x + width // 2, center_y + height // 2), (255, 0, 0), 2)
+            # cv2.imshow('threshold', threshold)
+            cv2.imshow('frame', frame)
+            # if cv2.waitKey(0) == ord('q'):
             #     break
         return rects
 
-    def findDiscSpeed(self, discMovement, pixelToRealRatio):
+    def findDiscSpeed(self, discs):
+        dt = 1/self.fps
         deltas = []
-        for discPos in discMovement:
-            d
+        skip = 1
+        for i in range(1, len(discs)):
+            distance = functions.distanceCalc(
+                (discs[i][0], discs[i][1]),
+                (discs[i-1][0], discs[i-1][1])
+            )
+            if distance <= 0 or discs[i][3] > self.frameShape[0] / 2:
+                skip += 1
+            else:
+                deltas.append(distance / skip)
+                skip = 1
+        constant = self.pixelToRealRatio * (1 / dt)
+        deltas = functions.remove_outliers(deltas)
+        print("Deltas: ", deltas)
+        speeds = [val * constant for val in deltas]
+        return np.mean(speeds)
+
+
