@@ -34,15 +34,15 @@ def main():
     vid.release()
 
     ratios = []
-    for frame in frames[:args.fps//2]:
+    for frame in frames[:args.fps//2]:  # first half second
         perspective = perspective_calculator.PerspectiveCalculator(radius)
         ratios.append(perspective.process_frame(frame))
-        # cv2.imshow('frame', frame)
-        # if cv2.waitKey(60) == ord('q'):
-        #     break
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(30) == ord('q'):
+            break
 
     ratio = np.mean(functions.remove_outliers(ratios))
-    print("RATIO:", ratio)
+    # print("RATIO:", ratio)
 
 
     lastHalf = frames[len(frames)//2:]
@@ -51,7 +51,7 @@ def main():
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
     speed = discTracker.findDiscSpeed(discs)
-    print(f"Speed = {speed}m/s")
+    print(f"Speed = {speed} m/s, {speed*2.23694} mph")
 
 
 if __name__ == '__main__':
