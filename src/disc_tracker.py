@@ -37,6 +37,7 @@ class DiscTracker:
 
     def findDisc(self, background):
         rects = []
+        firstFrameIndex, lastFrameIndex = None, None
         for i, frame in enumerate(self.frames):
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             image_blur = cv2.GaussianBlur(gray, (9,9), 2)
@@ -54,18 +55,26 @@ class DiscTracker:
             if not (rightmostPoint[0] >= frame.shape[1] - 1 or leftmostPoint[0] <= 1):
                 rects.append((center_x, center_y, width, height, i))
                 color = (255, 0, 0)
-            else:
+            else: #doesn't actually track the proper end for Brandon flick cropped because it leaves off the top 
+                if firstFrameIndex == None: firstFrameIndex = i
+                elif firstFrameIndex != None and lastFrameIndex == None: lastFrameIndex = i
                 color = (0, 0, 255)
 
             cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
                         (center_x + width // 2, center_y + height // 2), color, 2)
 
-            # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
-            if not leftmostPoint[0] >= rightmostPoint[0]:
-                # cv2.imshow('threshold', threshold)
-                cv2.imshow('frame', frame)
-                if cv2.waitKey(120) == ord('q'):
-                    break
+            # # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
+            # if not leftmostPoint[0] >= rightmostPoint[0]:
+            #     # cv2.imshow('threshold', threshold)
+            #     cv2.imshow('frame', frame)
+            #     if cv2.waitKey(120) == ord('q'):
+            #         break
+            # print(firstFrameIndex, lastFrameIndex)
+        for i in range(firstFrameIndex, lastFrameIndex + 1):
+            cv2.imshow('frame', self.frames[i])
+            sleep(0.1)
+            if cv2.waitKey(1) == ord('q'):
+                break
         return rects
 
     def findDiscSpeed(self, discs):
