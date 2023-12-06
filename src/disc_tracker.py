@@ -52,7 +52,7 @@ class DiscTracker:
             width = np.abs(rightmostPoint[0] - leftmostPoint[0])
             height = np.abs(lowestPoint[1] - highestPoint[1])
 
-            if not (rightmostPoint[0] >= frame.shape[1] - 1 or leftmostPoint[0] <= 1):
+            if not (rightmostPoint[0] >= frame.shape[1] - 1 or leftmostPoint[0] <= 1 or highestPoint[1] <= 1 or lowestPoint[1] >= frame.shape[0]):
                 rects.append((center_x, center_y, width, height, i))
                 color = (255, 0, 0)
             else: #doesn't actually track the proper end for Brandon flick cropped because it leaves off the top 
