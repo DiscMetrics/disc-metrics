@@ -7,8 +7,6 @@ from src import disc_tracker, perspective_calculator, functions
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('video', help='path to input video file')
-    parser.add_argument('--output', help='path to output video file (optional)')
-    parser.add_argument('--calibration', default='data/calib.txt', help='path to calibration file')
     parser.add_argument('--disc_radius', type=float, default=13.6525, help='radius of disc in cm')
     parser.add_argument('--fps', type=int, default=60, help='frames per second of video')
     args = parser.parse_args()
@@ -36,13 +34,16 @@ def main():
     ratios = []
     for frame in frames[:args.fps//2]:  # first half second
         perspective = perspective_calculator.PerspectiveCalculator(radius)
-        ratios.append(perspective.process_frame(frame))
+        ratio = perspective.process_frame(frame)
+        if ratio is not None:
+            ratios.append(ratio)
         cv2.imshow('frame', frame)
         if cv2.waitKey(30) == ord('q'):
             break
 
+    print("Ratios: ", ratios)
     ratio = np.mean(functions.remove_outliers(ratios))
-    # print("RATIO:", ratio)
+    print("RATIO:", ratio)
 
 
     lastHalf = frames[len(frames)//2:]
