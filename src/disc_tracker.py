@@ -5,11 +5,12 @@ import src.functions as functions
 
 class DiscTracker:
 
-    def __init__(self, videoFrames, pixelToRealRatio, fps):
+    def __init__(self, videoFrames, pixelToRealRatio, fps, no_video=False):
         self.frames = videoFrames[:]
         self.pixelToRealRatio = pixelToRealRatio
         self.fps = fps
         self.frameShape = self.frames[0].shape
+        self.no_video = no_video
 
     def findBackground(self):
         grayFrames = []
@@ -66,19 +67,20 @@ class DiscTracker:
 
             # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
 
-            if not leftmostPoint[0] >= rightmostPoint[0]:
-                if firstFrameIndex == None: firstFrameIndex = i
-                # cv2.imshow('threshold', threshold)
-                cv2.imshow('frame', frame)
+            if not self.no_video:
+                if not leftmostPoint[0] >= rightmostPoint[0]:
+                    if firstFrameIndex == None: firstFrameIndex = i
+                    # cv2.imshow('threshold', threshold)
+                    cv2.imshow('frame', frame)
+                    if cv2.waitKey(60) == ord('q'):
+                        break
+
+        # print("HERE!!!!", firstFrameIndex, lastFrameIndex)
+        if not self.no_video:
+            for i in range(firstFrameIndex, lastFrameIndex + 1):
+                cv2.imshow('frame', self.frames[i])
                 if cv2.waitKey(60) == ord('q'):
                     break
-
-        print("HERE!!!!", firstFrameIndex, lastFrameIndex)
-        for i in range(firstFrameIndex, lastFrameIndex + 1):
-            cv2.imshow('frame', self.frames[i])
-            # sleep(0.1)
-            if cv2.waitKey(60) == ord('q'):
-                break
         return rects
 
     def findDiscSpeed(self, discs):
@@ -104,4 +106,6 @@ class DiscTracker:
         print("Speeds: ", speeds)
         return np.mean(speeds)
         # return median
+
+
 

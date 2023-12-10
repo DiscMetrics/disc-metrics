@@ -7,6 +7,7 @@ from src import disc_tracker, perspective_calculator, functions
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('video', help='path to input video file')
+    parser.add_argument('--no-video', action='store_true', help='do not view popup video')
     parser.add_argument('--disc_radius', type=float, default=13.6525, help='radius of disc in cm')
     parser.add_argument('--fps', type=int, default=60, help='frames per second of video')
     args = parser.parse_args()
@@ -31,22 +32,24 @@ def main():
     frames = np.array(frames)
     vid.release()
 
+    # should move to perspective_calculator.py
     ratios = []
     for frame in frames[:args.fps//2]:  # first half second
         perspective = perspective_calculator.PerspectiveCalculator(radius)
         ratio = perspective.process_frame(frame)
         if ratio is not None:
             ratios.append(ratio)
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(30) == ord('q'):
-            break
+        if not args.no_video:
+            cv2.imshow('frame', frame)
+            if cv2.waitKey(30) == ord('q'):
+                break
 
     ratio = np.mean(functions.remove_outliers(ratios))
 
 
     lastHalf = frames[len(frames)//2:]
     leftHalf = [frame[:, :frame.shape[1]//2] for frame in lastHalf]
-    discTracker = disc_tracker.DiscTracker(leftHalf, ratio, args.fps)
+    discTracker = disc_tracker.DiscTracker(leftHalf, ratio, args.fps, args.no_video)
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
     speed = discTracker.findDiscSpeed(discs)
