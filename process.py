@@ -42,6 +42,7 @@ def main():
         if not args.no_video:
             cv2.imshow('frame', frame)
             if cv2.waitKey(30) == ord('q'):
+                cv2.destroyWindow('frame')
                 break
 
     ratio = np.mean(functions.remove_outliers(ratios))
