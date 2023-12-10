@@ -55,7 +55,7 @@ class DiscTracker:
             if not (rightmostPoint[0] >= frame.shape[1] - 1 or leftmostPoint[0] <= 1 or highestPoint[1] <= 1 or lowestPoint[1] >= frame.shape[0]):
                 rects.append((center_x, center_y, width, height, i))
                 color = (255, 0, 0)
-            else: #doesn't actually track the proper end for Brandon flick cropped because it leaves off the top 
+            else: #doesn't actually track the proper end for Brandon flick cropped because it leaves off the top
                 if firstFrameIndex == None: firstFrameIndex = i
                 elif firstFrameIndex != None and lastFrameIndex == None: lastFrameIndex = i
                 color = (0, 0, 255)
@@ -63,17 +63,19 @@ class DiscTracker:
             cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
                         (center_x + width // 2, center_y + height // 2), color, 2)
 
-            # # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
+            # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
+
             # if not leftmostPoint[0] >= rightmostPoint[0]:
             #     # cv2.imshow('threshold', threshold)
             #     cv2.imshow('frame', frame)
-            #     if cv2.waitKey(120) == ord('q'):
+            #     if cv2.waitKey(0) == ord('q'):
             #         break
-            # print(firstFrameIndex, lastFrameIndex)
+
+        print(firstFrameIndex, lastFrameIndex)
         for i in range(firstFrameIndex, lastFrameIndex + 1):
             cv2.imshow('frame', self.frames[i])
-            sleep(0.1)
-            if cv2.waitKey(1) == ord('q'):
+            # sleep(0.1)
+            if cv2.waitKey(60) == ord('q'):
                 break
         return rects
 
@@ -89,12 +91,16 @@ class DiscTracker:
             if distance <= 0 or discs[i][3] > self.frameShape[0] / 2:
                 skip += 1
             else:
+                print(distance / skip)
                 deltas.append(distance / skip)
                 skip = 1
         constant = self.pixelToRealRatio * (1 / dt)
-        deltas = functions.remove_outliers(deltas)
+        deltas = functions.remove_outliers(deltas, 1)
+        print("Ratio:", self.pixelToRealRatio)
         print("Deltas: ", deltas)
         speeds = [val * constant for val in deltas]
+        # median = np.median(speeds)
+        print("Speeds: ", speeds)
         return np.mean(speeds)
-
+        # return median
 
