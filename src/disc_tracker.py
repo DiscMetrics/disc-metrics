@@ -58,8 +58,8 @@ class DiscTracker:
                 rects.append((center_x, center_y, width, height, i))
                 color = (255, 0, 0)
             else: #doesn't actually track the proper end for Brandon flick cropped because it leaves off the top
-                if firstFrameIndex == None: firstFrameIndex = i
-                elif firstFrameIndex != None and lastFrameIndex == None: lastFrameIndex = i
+                # if firstFrameIndex == None: firstFrameIndex = i
+                # elif firstFrameIndex != None and lastFrameIndex == None: lastFrameIndex = i
                 color = (0, 0, 255)
 
             cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
@@ -70,8 +70,9 @@ class DiscTracker:
             if not self.no_video:
                 if not leftmostPoint[0] >= rightmostPoint[0]:
                     if firstFrameIndex == None: firstFrameIndex = i
-                    # cv2.imshow('threshold', threshold)
-                    cv2.imshow('frame', frame)
+                    lastFrameIndex = i
+                    # cv2.imshow('left', threshold)
+                    cv2.imshow('left', frame)
                     if cv2.waitKey(60) == ord('q'):
                         break
 
@@ -106,6 +107,4 @@ class DiscTracker:
         print("Speeds: ", speeds)
         return np.mean(speeds)
         # return median
-
-
 
