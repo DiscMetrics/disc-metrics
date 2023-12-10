@@ -41,9 +41,7 @@ def main():
         if cv2.waitKey(30) == ord('q'):
             break
 
-    print("Ratios: ", ratios)
     ratio = np.mean(functions.remove_outliers(ratios))
-    print("RATIO:", ratio)
 
 
     lastHalf = frames[len(frames)//2:]
