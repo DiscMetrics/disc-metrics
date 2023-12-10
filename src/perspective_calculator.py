@@ -8,11 +8,12 @@ class PerspectiveCalculator:
 
     def process_frame(self, frame):
         discs = self.detect_disc(frame)
+        radii = []
         for disc in discs:
             x, y, r = disc
             self.draw_circles(frame, x, y, r)
-            ratio = self.calculate_ratio(r)
-        return ratio
+            radii.append(r)
+        return self.calculate_ratio(max(radii)) if radii else None
 
     def detect_disc(self, frame):
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
