@@ -14,5 +14,7 @@ def distanceCalc(p1, p2):
 
 def remove_outliers(lst, m=2):
     data = np.array(lst)
-    data = data[abs(data - np.mean(data)) < m * np.std(data)]
+    median = np.median(data)
+    mad = np.median(np.abs(data - median))
+    data = data[abs(data - median) < m * mad]
     return np.ndarray.tolist(data)
