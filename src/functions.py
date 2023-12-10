@@ -16,5 +16,6 @@ def remove_outliers(lst, m=2):
     data = np.array(lst)
     median = np.median(data)
     mad = np.median(np.abs(data - median))
+    mad = mad if mad else 1.4826  # 1.4826 is the MAD of a standard normal distribution
     data = data[abs(data - median) < m * mad]
     return np.ndarray.tolist(data)
