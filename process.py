@@ -42,6 +42,7 @@ def main():
         if not args.no_video:
             cv2.imshow('frame', frame)
             if cv2.waitKey(30) == ord('q'):
+                cv2.destroyWindow('frame')
                 break
 
     ratio = np.mean(functions.remove_outliers(ratios))
@@ -52,8 +53,9 @@ def main():
     discTracker = disc_tracker.DiscTracker(leftHalf, ratio, args.fps, args.no_video)
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
-    speed = discTracker.findDiscSpeed(discs)
+    speed, angle = discTracker.findDiscSpeedAngle(discs)
     print(f"Speed = {speed} m/s, {speed*2.23694} mph")
+    print(f"Angle = {angle} radians, {angle * 180 / np.pi} degrees")
 
 
 if __name__ == '__main__':
