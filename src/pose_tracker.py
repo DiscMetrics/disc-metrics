@@ -3,6 +3,7 @@ import numpy as np
 from time import sleep
 import src.functions as functions
 import os
+import matplotlib.pyplot as plt
 
 import mediapipe as mp
 from mediapipe.tasks import python
@@ -74,6 +75,7 @@ class PoseTracker:
 
     def findKeypoints(self):
         keypointedFrames = []
+        landmarkedPoses = []
         rgbFrames = np.array(self.frames)[:, :, :, ::-1]
         for i, frame in enumerate(rgbFrames):
             trimmed = frame[60:-60,:,:]
@@ -102,7 +104,42 @@ class PoseTracker:
             # cv2.imshow("frame", cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
             # if cv2.waitKey(1) == ord('q'): break
             print(f"Iteration: {i}")
-            keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-        return keypointedFrames
 
-            
+            landmarkedPoses.append(pose_landmarker_result)
+            keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+        return landmarkedPoses, keypointedFrames
+    
+    def createWireFrame(self, landmarkedPoses, frameIndex):
+        if type(frameIndex) is not int or frameIndex < 0 or frameIndex >= len(landmarkedPoses):
+            print(f"Invalid frameIndex: {frameIndex}")
+            return None
+        
+        ax = plt.axes(projection='3d')
+        landmarks = (landmarkedPoses[frameIndex]).pose_landmarks[0]
+
+        headToLeftShoulder = [(landmarks[0].x, landmarks[12].x), (landmarks[0].y, landmarks[12].y), (landmarks[0].z, landmarks[12].z)]
+        headToRightShoulder = [(landmarks[0].x, landmarks[11].x), (landmarks[0].y, landmarks[11].y), (landmarks[0].z, landmarks[11].z)]
+        betweenShoulders = [(landmarks[11].x, landmarks[12].x), (landmarks[11].y, landmarks[12].y), (landmarks[11].z, landmarks[12].z)]
+        rightShoulderToElbow = [(landmarks[12].x, landmarks[14].x), (landmarks[12].y, landmarks[14].y), (landmarks[12].z, landmarks[14].z)]
+        rightElbowToPalm = [(landmarks[14].x, landmarks[16].x), (landmarks[14].y, landmarks[16].y), (landmarks[14].z, landmarks[16].z)]
+        leftShoulderToElbow = [(landmarks[11].x, landmarks[13].x), (landmarks[11].y, landmarks[13].y), (landmarks[11].z, landmarks[13].z)]
+        leftElbowToPalm = [(landmarks[13].x, landmarks[15].x), (landmarks[13].y, landmarks[15].y), (landmarks[13].z, landmarks[15].z)]
+        rightShoulderToHip = [(landmarks[24].x, landmarks[12].x), (landmarks[24].y, landmarks[12].y), (landmarks[24].z, landmarks[12].z)]
+        leftShoulderToHip = [(landmarks[11].x, landmarks[23].x), (landmarks[11].y, landmarks[23].y), (landmarks[11].z, landmarks[23].z)]
+        betweenHips = [(landmarks[24].x, landmarks[23].x), (landmarks[24].y, landmarks[23].y), (landmarks[24].z, landmarks[23].z)]
+        rightHipToKnee = [(landmarks[24].x, landmarks[26].x), (landmarks[24].y, landmarks[26].y), (landmarks[24].z, landmarks[26].z)]
+        rightKneeToAnkle = [(landmarks[26].x, landmarks[28].x), (landmarks[26].y, landmarks[28].y), (landmarks[26].z, landmarks[28].z)]
+        leftHipToKnee = [(landmarks[23].x, landmarks[25].x), (landmarks[23].y, landmarks[25].y), (landmarks[23].z, landmarks[25].z)]
+        leftKneeToAnkle = [(landmarks[25].x, landmarks[27].x), (landmarks[25].y, landmarks[27].y), (landmarks[25].z, landmarks[27].z)]
+
+        lines = [headToLeftShoulder, headToRightShoulder, betweenShoulders, rightShoulderToElbow, rightElbowToPalm, leftShoulderToElbow, leftElbowToPalm, rightShoulderToHip, leftShoulderToHip, betweenHips, rightHipToKnee, rightKneeToAnkle, leftHipToKnee, leftKneeToAnkle]
+        
+        for line in lines:
+            ax.plot3D(line[0], line[1], line[2])
+
+
+        ax.set_xlabel('X')
+        ax.set_ylabel('Y')
+        ax.set_zlabel('Z')
+        plt.show()
+
