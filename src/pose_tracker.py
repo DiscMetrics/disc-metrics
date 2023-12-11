@@ -20,12 +20,13 @@ if not os.path.exists(model_path):
 
 class PoseTracker:
 
-    def __init__(self, videoFrames, pixelToRealRatio, fps):
+    def __init__(self, videoFrames, pixelToRealRatio, fps, frameIndex):
         self.frames = videoFrames[:]
         self.pixelToRealRatio = pixelToRealRatio
         self.fps = fps
         self.frameShape = self.frames[0].shape
         self.modelPath = POSE_DETECTION_MODEL_PATH
+        self.frameIndex = frameIndex
 
     def draw_landmarks_on_original_image(self, original_image, detection_result):
         pose_landmarks_list = detection_result.pose_landmarks
@@ -90,7 +91,7 @@ class PoseTracker:
                 base_options=BaseOptions(model_asset_path=self.modelPath),
                 running_mode=VisionRunningMode.IMAGE
                 )
-            
+
             with PoseLandmarker.create_from_options(options) as landmarker:
                 pose_landmarker_result = landmarker.detect(image)
 
@@ -105,4 +106,10 @@ class PoseTracker:
             keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
         return keypointedFrames
 
-            
+    def getReleaseFrame(self, firstFrameindex, speed, pos):
+        x0 = self.frames.shape[2] // 2
+        t0 = firstFrameindex
+        x1 = pos.x
+        t1 = abs(x1 - x0) / speed + t0
+        return t1
+
