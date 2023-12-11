@@ -12,7 +12,7 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
 
-POSE_DETECTION_MODEL_PATH = r'C:\Users\pfnas\OneDrive\Documents\2Sophomore\23Fall\Computer Vision\disc-metrics\models\pose_landmarker_lite.task'
+POSE_DETECTION_MODEL_PATH = r'.\models\pose_landmarker_lite.task'
 model_path = os.path.abspath(POSE_DETECTION_MODEL_PATH)
 
 if not os.path.exists(model_path):
@@ -109,12 +109,12 @@ class PoseTracker:
             landmarkedPoses.append(pose_landmarker_result)
             keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
         return landmarkedPoses, keypointedFrames
-    
+
     def createWireFrame( self, landmarkedPoses, frameIndex, ax=plt.axes(projection='3d') ):
         if type(frameIndex) is not int or frameIndex < 0 or frameIndex >= len(landmarkedPoses):
             print(f"Invalid frameIndex: {frameIndex}")
             return None
-        
+
         ax.cla()
 
         landmarks = (landmarkedPoses[frameIndex]).pose_landmarks[0]
@@ -145,9 +145,9 @@ class PoseTracker:
         # ax.show()
         plt.show()
 
-    def getReleaseFrame(self, frameIndex, speed, point):
+    def getReleaseFrame(self, speed, point):
         x0 = self.frames.shape[2] // 2
-        t0 = frameIndex
+        t0 = self.frameIndex
         x1 = point.x
         t2 = abs(x1 - x0) / speed + t0
         return t2

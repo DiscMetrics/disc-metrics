@@ -54,10 +54,15 @@ def main():
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
     realSpeed, angle, pixelSpeed = discTracker.findDiscSpeedAngle(discs)
-    frameIndex = discTracker.getFirstFrameIndex()
+    frameIndex = discTracker.getFirstFrameIndex() + len(frames)//2
     poseAnalysisFrames = frames[frameIndex-2*args.fps:frameIndex+1*args.fps]
     TrimmedFrameIndex = 2 * args.fps
     rightHalf = [frame[:, frame.shape[1]//2:] for frame in poseAnalysisFrames]
+    for frame in rightHalf:
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(30) == ord('q'):
+            cv2.destroyWindow('frame')
+            break
     PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps, TrimmedFrameIndex)
     # PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, pos)
     print(f"Speed = {realSpeed} m/s, {realSpeed * 2.23694} mph")
