@@ -103,10 +103,11 @@ class PoseTracker:
             # annotated_image = self.draw_landmarks_on_image(image.numpy_view(), pose_landmarker_result)
             # cv2.imshow("frame", cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
             # if cv2.waitKey(1) == ord('q'): break
-            print(f"Analyzing frame: {i+1} of {len(rgbFrames)}")
+            print(f"\rAnalyzing frame: {i+1} of {len(rgbFrames)}", end="", flush=True)
 
             landmarkedPoses.append(pose_landmarker_result)
             keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+        print()
         return landmarkedPoses, keypointedFrames
 
     def createWireFrame( self, landmarkedPoses, frameIndex, ax=plt.axes(projection='3d') ):

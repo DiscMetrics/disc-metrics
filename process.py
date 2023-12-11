@@ -10,6 +10,7 @@ def main():
     parser.add_argument('--no-video', action='store_true', help='do not view popup video')
     parser.add_argument('--disc_radius', type=float, default=13.6525, help='radius of disc in cm')
     parser.add_argument('--fps', type=int, default=60, help='frames per second of video')
+    parser.add_argument('--no-pose', action='store_true', help='do not perform pose analysis')
     args = parser.parse_args()
 
     radius = args.disc_radius / 100
@@ -54,15 +55,21 @@ def main():
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
     realSpeed, angle, pixelSpeed = discTracker.findDiscSpeedAngle(discs)
-    frameIndex = discTracker.getFirstFrameIndex() + len(frames) // 2
-    poseAnalysisFrames = frames[frameIndex-2*args.fps:frameIndex+1*args.fps]
-    TrimmedFrameIndex = 2 * args.fps
-    rightHalf = [frame[:, frame.shape[1]//2:] for frame in poseAnalysisFrames]
-    cv2.destroyAllWindows()
-    PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps, TrimmedFrameIndex)
-    landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
-    WireframeAnimater = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
-    WireframeAnimater.animateWireframe()
+    if not args.no_pose:
+        frameIndex = discTracker.getFirstFrameIndex() + len(frames) // 2
+        poseAnalysisFrames = frames[frameIndex-2*args.fps:frameIndex+1*args.fps]
+        TrimmedFrameIndex = 2 * args.fps
+        rightHalf = [frame[:, frame.shape[1]//2:] for frame in poseAnalysisFrames]
+        cv2.destroyAllWindows()
+        PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps, TrimmedFrameIndex)
+        landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
+        if not args.no_video:
+            frame = PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, landmarkedPoses[TrimmedFrameIndex][0])
+            cv2.imshow('frame', frame)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        WireframeAnimator = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
+        WireframeAnimator.animateWireframe()
     # PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, pos)
     print(f"Speed = {realSpeed} m/s, {realSpeed * 2.23694} mph")
     print(f"Angle = {angle} radians, {angle * 180 / np.pi} degrees")
