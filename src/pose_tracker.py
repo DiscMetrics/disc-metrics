@@ -12,7 +12,7 @@ from mediapipe import solutions
 from mediapipe.framework.formats import landmark_pb2
 
 
-POSE_DETECTION_MODEL_PATH = r'C:\Users\pfnas\OneDrive\Documents\2Sophomore\23Fall\Computer Vision\disc-metrics\models\pose_landmarker_lite.task'
+POSE_DETECTION_MODEL_PATH = r'.\models\pose_landmarker_lite.task'
 model_path = os.path.abspath(POSE_DETECTION_MODEL_PATH)
 
 if not os.path.exists(model_path):
@@ -25,7 +25,6 @@ class PoseTracker:
         self.frames = videoFrames[:]
         self.pixelToRealRatio = pixelToRealRatio
         self.fps = fps
-        self.frameShape = self.frames[0].shape
         self.modelPath = POSE_DETECTION_MODEL_PATH
         self.frameIndex = frameIndex
 
@@ -145,9 +144,9 @@ class PoseTracker:
         # ax.show()
         plt.show()
 
-    def getReleaseFrame(self, frameIndex, speed, point):
+    def getReleaseFrame(self, speed, point):
         x0 = self.frames.shape[2] // 2
-        t0 = frameIndex
+        t0 = self.frameIndex
         x1 = point.x
         t2 = abs(x1 - x0) / speed + t0
         return t2

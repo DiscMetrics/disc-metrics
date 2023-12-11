@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import argparse
-from src import disc_tracker, perspective_calculator, functions, pose_tracker
+from src import disc_tracker, perspective_calculator, functions, pose_tracker, wireframe_animation
 
 
 def main():
@@ -54,11 +54,15 @@ def main():
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
     realSpeed, angle, pixelSpeed = discTracker.findDiscSpeedAngle(discs)
-    frameIndex = discTracker.getFirstFrameIndex()
+    frameIndex = discTracker.getFirstFrameIndex() + len(frames) // 2
     poseAnalysisFrames = frames[frameIndex-2*args.fps:frameIndex+1*args.fps]
     TrimmedFrameIndex = 2 * args.fps
     rightHalf = [frame[:, frame.shape[1]//2:] for frame in poseAnalysisFrames]
+    cv2.destroyAllWindows()
     PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps, TrimmedFrameIndex)
+    landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
+    WireframeAnimater = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
+    WireframeAnimater.animateWireframe()
     # PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, pos)
     print(f"Speed = {realSpeed} m/s, {realSpeed * 2.23694} mph")
     print(f"Angle = {angle} radians, {angle * 180 / np.pi} degrees")
