@@ -44,16 +44,16 @@ def main():
 
     ratio = np.mean(functions.remove_outliers(ratios))
 
-    firstHalf = frames[:len(frames)//2]
-    rightHalf = [frame[:, frame.shape[1]//2:] for frame in frames]
+    rightHalf = [frame[:, frame.shape[1]//2:] for frame in frames[20:30]]
 
     PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps)
-    keypointedFrames = PoseTracker.findKeypoints()
-    for frame in keypointedFrames:
-        cv2.imshow('frame', frame)
-        sleep(0.1)
-        if cv2.waitKey(1) == ord('q'):
-            break
+    landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
+    PoseTracker.createWireFrame(landmarkedPoses, 5)
+    # for frame in keypointedFrames:
+    #     cv2.imshow('frame', frame)
+    #     sleep(0.1)
+    #     if cv2.waitKey(1) == ord('q'):
+    #         break
 
 if __name__ == '__main__':
     main()
