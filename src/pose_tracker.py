@@ -144,3 +144,9 @@ class PoseTracker:
         ax.set_zlabel('Z')
         plt.show()
 
+    def getReleaseFrame(self, frameIndex, speed, point):
+        x0 = self.frames.shape[2] // 2
+        t0 = frameIndex
+        x1 = point.x
+        t2 = abs(x1 - x0) / speed + t0
+        return t2
