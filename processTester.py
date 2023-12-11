@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import argparse
-from src import disc_tracker, perspective_calculator, functions, pose_tracker
+from src import disc_tracker, perspective_calculator, functions, pose_tracker, wireframe_animation
 from time import sleep
 
 
@@ -48,7 +48,11 @@ def main():
 
     PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps)
     landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
-    PoseTracker.createWireFrame(landmarkedPoses, 5)
+    # PoseTracker.createWireFrame(landmarkedPoses, 5)
+
+    WireframeAnimater = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
+    WireframeAnimater.animateWireframe()
+
     # for frame in keypointedFrames:
     #     cv2.imshow('frame', frame)
     #     sleep(0.1)
