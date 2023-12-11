@@ -25,7 +25,6 @@ class PoseTracker:
         self.frames = videoFrames[:]
         self.pixelToRealRatio = pixelToRealRatio
         self.fps = fps
-        self.frameShape = self.frames[0].shape
         self.modelPath = POSE_DETECTION_MODEL_PATH
         self.frameIndex = frameIndex
 
