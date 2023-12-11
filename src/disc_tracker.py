@@ -72,11 +72,11 @@ class DiscTracker:
                 if not leftmostPoint[0] >= rightmostPoint[0]:
                     if self.firstFrameIndex == None: self.firstFrameIndex = i
                     lastFrameIndex = i
-                    # cv2.imshow('left', threshold)
-                    cv2.imshow('left', frame)
-                    if cv2.waitKey(0) == ord('q'):
-                        cv2.destroyWindow('left')
-                        break
+                    # # cv2.imshow('left', threshold)
+                    # cv2.imshow('left', frame)
+                    # if cv2.waitKey(0) == ord('q'):
+                    #     cv2.destroyWindow('left')
+                    #     break
 
         # print("HERE!!!!", firstFrameIndex, lastFrameIndex)
         if not self.no_video:
