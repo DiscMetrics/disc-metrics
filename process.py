@@ -54,7 +54,10 @@ def main():
     background = discTracker.findBackground()
     discs = discTracker.findDisc(background)
     speed, angle = discTracker.findDiscSpeedAngle(discs)
-    print(f"Speed = {speed} m/s, {speed*2.23694} mph")
+    frameIndex = discTracker.getFirstFrameIndex()
+    poseAnalysisFrames = frames[frameIndex-2*args.fps:frameIndex+1*args.fps]
+
+    print(f"Speed = {speed} m/s, {speed * 2.23694} mph")
     print(f"Angle = {angle} radians, {angle * 180 / np.pi} degrees")
 
 
