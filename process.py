@@ -64,6 +64,11 @@ def main():
         PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps, TrimmedFrameIndex)
         landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
         WireframeAnimator = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
+        for frame in keypointedFrames:
+            cv2.imshow('frame', frame)
+            if cv2.waitKey(60) == ord('q'):
+                break
+        cv2.destroyAllWindows()
         WireframeAnimator.animateWireframe()
     # PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, pos)
     print(f"Speed = {realSpeed} m/s, {realSpeed * 2.23694} mph")

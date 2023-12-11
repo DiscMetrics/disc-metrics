@@ -9,20 +9,20 @@ class WireframeAnimator:
         self.landmarkedPoses = landmarkedPoses
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111, projection='3d')
-    
+
     def initialize_animation(self):
         return self.ax
 
     def update(self, frameIndex):
         self.ax.cla()
         self.ax.grid(False)
-        self.ax.set_axis_off()
-        # self.ax.set_xlabel('X')
-        # self.ax.set_ylabel('Y')
-        # self.ax.set_zlabel('Z')
-        self.ax.set_xlim(-.5, .5)
-        self.ax.set_ylim(-.5, .5)
-        self.ax.set_zlim(-.5, .5)
+        # self.ax.set_axis_off()
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.set_zlabel('Z')
+        # self.ax.set_xlim(-.5, .5)
+        # self.ax.set_ylim(-.5, .5)
+        # self.ax.set_zlim(-.5, .5)
         # print("frame:", frameIndex + 1, "/ total frames:", len(self.landmarkedPoses))
 
         try:
@@ -43,11 +43,11 @@ class WireframeAnimator:
             leftKneeToAnkle = [(landmarks[25].x, landmarks[27].x), (landmarks[25].y, landmarks[27].y), (landmarks[25].z, landmarks[27].z)]
             lines = [headToLeftShoulder, headToRightShoulder, betweenShoulders, rightShoulderToElbow, rightElbowToPalm, leftShoulderToElbow, leftElbowToPalm, rightShoulderToHip, leftShoulderToHip, betweenHips, rightHipToKnee, rightKneeToAnkle, leftHipToKnee, leftKneeToAnkle]
             for line in lines:
-                self.ax.plot3D(line[0], line[1], line[2])
+                self.ax.plot3D(line[0], line[2], line[1])
         except IndexError:
             pass
 
-        return self.ax, 
+        return self.ax,
 
     def animateWireframe(self):
         # print("len(self.frames):", len(self.frames))

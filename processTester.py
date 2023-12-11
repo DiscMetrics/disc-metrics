@@ -51,13 +51,13 @@ def main():
     # PoseTracker.createWireFrame(landmarkedPoses, 5)
 
     WireframeAnimater = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
-    WireframeAnimater.animateWireframe()
+    # WireframeAnimater.animateWireframe()
 
-    # for frame in keypointedFrames:
-    #     cv2.imshow('frame', frame)
-    #     sleep(0.1)
-    #     if cv2.waitKey(1) == ord('q'):
-    #         break
+    for frame in keypointedFrames:
+        cv2.imshow('frame', frame)
+        sleep(0.1)
+        if cv2.waitKey(1) == ord('q'):
+            break
 
 if __name__ == '__main__':
     main()

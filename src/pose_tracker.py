@@ -103,7 +103,8 @@ class PoseTracker:
             # annotated_image = self.draw_landmarks_on_image(image.numpy_view(), pose_landmarker_result)
             # cv2.imshow("frame", cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
             # if cv2.waitKey(1) == ord('q'): break
-            print(f"\rAnalyzing frame: {i+1} of {len(rgbFrames)}", end="", flush=True)
+            char = "-" if i % 4 == 0 else "\\" if i % 4 == 1 else "|" if i % 4 == 2 else "/"
+            print(f"\rAnalyzing frame: {i+1} of {len(rgbFrames)} {char}", end="", flush=True)
 
             landmarkedPoses.append(pose_landmarker_result)
             keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
@@ -137,7 +138,7 @@ class PoseTracker:
         lines = [headToLeftShoulder, headToRightShoulder, betweenShoulders, rightShoulderToElbow, rightElbowToPalm, leftShoulderToElbow, leftElbowToPalm, rightShoulderToHip, leftShoulderToHip, betweenHips, rightHipToKnee, rightKneeToAnkle, leftHipToKnee, leftKneeToAnkle]
 
         for line in lines:
-            ax.plot3D(line[0], line[1], line[2])
+            ax.plot3D(line[0], line[2], line[1])
 
         ax.set_xlabel('X')
         ax.set_ylabel('Y')

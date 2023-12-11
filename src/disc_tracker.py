@@ -54,13 +54,10 @@ class DiscTracker:
             width = np.abs(rightmostPoint[0] - leftmostPoint[0])
             height = np.abs(lowestPoint[1] - highestPoint[1])
 
-            # TODO - fix ugly code
             if not (rightmostPoint[0] >= frame.shape[1] - 1 or leftmostPoint[0] <= 1 or highestPoint[1] <= 1 or lowestPoint[1] >= frame.shape[0]):
                 rects.append((center_x, center_y, width, height, i, leftmostPoint, rightmostPoint))
                 color = (255, 0, 0)
-            else: #doesn't actually track the proper end for Brandon flick cropped because it leaves off the top
-                # if firstFrameIndex == None: firstFrameIndex = i
-                # elif firstFrameIndex != None and lastFrameIndex == None: lastFrameIndex = i
+            else:
                 color = (0, 0, 255)
 
             cv2.rectangle(frame, (center_x - width // 2, center_y - height // 2),
@@ -68,13 +65,12 @@ class DiscTracker:
 
             # if leftmostPoint[0] == frame.shape[1] and rightmostPoint[0] == 0:  # alt method to ignore frames with no disc
 
-            if not self.no_video:
-                if not leftmostPoint[0] >= rightmostPoint[0]:
-                    if self.firstFrameIndex == None: self.firstFrameIndex = i
-                    lastFrameIndex = i
-                    # # cv2.imshow('left', threshold)
-                    # cv2.imshow('left', frame)
-                    # if cv2.waitKey(0) == ord('q'):
+            if not leftmostPoint[0] >= rightmostPoint[0]:
+                if self.firstFrameIndex == None: self.firstFrameIndex = i
+                lastFrameIndex = i
+                    # cv2.imshow('left', threshold)
+                    # # cv2.imshow('left', frame)
+                    # if cv2.waitKey(220) == ord('q'):
                     #     cv2.destroyWindow('left')
                     #     break
 
@@ -82,7 +78,7 @@ class DiscTracker:
         if not self.no_video:
             for i in range(self.firstFrameIndex, lastFrameIndex + 1):
                 cv2.imshow('frame', self.frames[i])
-                if cv2.waitKey(60) == ord('q'):
+                if cv2.waitKey(120) == ord('q'):
                     cv2.destroyWindow('frame')
                     break
         return rects
