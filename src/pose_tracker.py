@@ -21,12 +21,13 @@ if not os.path.exists(model_path):
 
 class PoseTracker:
 
-    def __init__(self, videoFrames, pixelToRealRatio, fps):
+    def __init__(self, videoFrames, pixelToRealRatio, fps, frameIndex):
         self.frames = videoFrames[:]
         self.pixelToRealRatio = pixelToRealRatio
         self.fps = fps
         self.frameShape = self.frames[0].shape
         self.modelPath = POSE_DETECTION_MODEL_PATH
+        self.frameIndex = frameIndex
 
     def draw_landmarks_on_original_image(self, original_image, detection_result):
         pose_landmarks_list = detection_result.pose_landmarks
@@ -92,7 +93,7 @@ class PoseTracker:
                 base_options=BaseOptions(model_asset_path=self.modelPath),
                 running_mode=VisionRunningMode.IMAGE
                 )
-            
+
             with PoseLandmarker.create_from_options(options) as landmarker:
                 pose_landmarker_result = landmarker.detect(image)
 
@@ -134,7 +135,7 @@ class PoseTracker:
         leftKneeToAnkle = [(landmarks[25].x, landmarks[27].x), (landmarks[25].y, landmarks[27].y), (landmarks[25].z, landmarks[27].z)]
 
         lines = [headToLeftShoulder, headToRightShoulder, betweenShoulders, rightShoulderToElbow, rightElbowToPalm, leftShoulderToElbow, leftElbowToPalm, rightShoulderToHip, leftShoulderToHip, betweenHips, rightHipToKnee, rightKneeToAnkle, leftHipToKnee, leftKneeToAnkle]
-        
+
         for line in lines:
             ax.plot3D(line[0], line[1], line[2])
 
@@ -144,3 +145,9 @@ class PoseTracker:
         # ax.show()
         plt.show()
 
+    def getReleaseFrame(self, frameIndex, speed, point):
+        x0 = self.frames.shape[2] // 2
+        t0 = frameIndex
+        x1 = point.x
+        t2 = abs(x1 - x0) / speed + t0
+        return t2
