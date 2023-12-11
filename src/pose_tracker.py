@@ -21,12 +21,13 @@ if not os.path.exists(model_path):
 
 class PoseTracker:
 
-    def __init__(self, videoFrames, pixelToRealRatio, fps):
+    def __init__(self, videoFrames, pixelToRealRatio, fps, frameIndex):
         self.frames = videoFrames[:]
         self.pixelToRealRatio = pixelToRealRatio
         self.fps = fps
         self.frameShape = self.frames[0].shape
         self.modelPath = POSE_DETECTION_MODEL_PATH
+        self.frameIndex = frameIndex
 
     def draw_landmarks_on_original_image(self, original_image, detection_result):
         pose_landmarks_list = detection_result.pose_landmarks
@@ -92,7 +93,7 @@ class PoseTracker:
                 base_options=BaseOptions(model_asset_path=self.modelPath),
                 running_mode=VisionRunningMode.IMAGE
                 )
-            
+
             with PoseLandmarker.create_from_options(options) as landmarker:
                 pose_landmarker_result = landmarker.detect(image)
 
@@ -108,12 +109,12 @@ class PoseTracker:
             landmarkedPoses.append(pose_landmarker_result)
             keypointedFrames.append(cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
         return landmarkedPoses, keypointedFrames
-    
+
     def createWireFrame(self, landmarkedPoses, frameIndex):
         if type(frameIndex) is not int or frameIndex < 0 or frameIndex >= len(landmarkedPoses):
             print(f"Invalid frameIndex: {frameIndex}")
             return None
-        
+
         ax = plt.axes(projection='3d')
         landmarks = (landmarkedPoses[frameIndex]).pose_landmarks[0]
 
@@ -133,7 +134,7 @@ class PoseTracker:
         leftKneeToAnkle = [(landmarks[25].x, landmarks[27].x), (landmarks[25].y, landmarks[27].y), (landmarks[25].z, landmarks[27].z)]
 
         lines = [headToLeftShoulder, headToRightShoulder, betweenShoulders, rightShoulderToElbow, rightElbowToPalm, leftShoulderToElbow, leftElbowToPalm, rightShoulderToHip, leftShoulderToHip, betweenHips, rightHipToKnee, rightKneeToAnkle, leftHipToKnee, leftKneeToAnkle]
-        
+
         for line in lines:
             ax.plot3D(line[0], line[1], line[2])
 
