@@ -11,6 +11,7 @@ class DiscTracker:
         self.fps = fps
         self.frameShape = self.frames[0].shape
         self.no_video = no_video
+        self.firstFrameIndex = None
 
     def findBackground(self):
         grayFrames = []
@@ -38,7 +39,7 @@ class DiscTracker:
 
     def findDisc(self, background):
         rects = []
-        firstFrameIndex, lastFrameIndex = None, None
+        lastFrameIndex = None
         for i, frame in enumerate(self.frames):
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             image_blur = cv2.GaussianBlur(gray, (9,9), 2)
@@ -69,7 +70,7 @@ class DiscTracker:
 
             if not self.no_video:
                 if not leftmostPoint[0] >= rightmostPoint[0]:
-                    if firstFrameIndex == None: firstFrameIndex = i
+                    if self.firstFrameIndex == None: self.firstFrameIndex = i
                     lastFrameIndex = i
                     # cv2.imshow('left', threshold)
                     cv2.imshow('left', frame)
@@ -79,7 +80,7 @@ class DiscTracker:
 
         # print("HERE!!!!", firstFrameIndex, lastFrameIndex)
         if not self.no_video:
-            for i in range(firstFrameIndex, lastFrameIndex + 1):
+            for i in range(self.firstFrameIndex, lastFrameIndex + 1):
                 cv2.imshow('frame', self.frames[i])
                 if cv2.waitKey(60) == ord('q'):
                     cv2.destroyWindow('frame')
@@ -113,4 +114,7 @@ class DiscTracker:
         print("Speeds: ", speeds)
         return np.mean(speeds), np.mean(angles)
         # return median
+
+    def getFirstFrameIndex(self):
+        return self.firstFrameIndex
 
