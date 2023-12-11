@@ -63,11 +63,6 @@ def main():
         cv2.destroyAllWindows()
         PoseTracker = pose_tracker.PoseTracker(rightHalf, ratio, args.fps, TrimmedFrameIndex)
         landmarkedPoses, keypointedFrames = PoseTracker.findKeypoints()
-        if not args.no_video:
-            frame = PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, landmarkedPoses[TrimmedFrameIndex][0])
-            cv2.imshow('frame', frame)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
         WireframeAnimator = wireframe_animation.WireframeAnimator(rightHalf, args.fps, landmarkedPoses)
         WireframeAnimator.animateWireframe()
     # PoseTracker.getReleaseFrame(TrimmedFrameIndex, pixelSpeed, pos)
