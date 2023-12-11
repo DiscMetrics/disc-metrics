@@ -112,7 +112,7 @@ class DiscTracker:
         speeds = [val * constant for val in deltas]
         # median = np.median(speeds)
         print("Speeds: ", speeds)
-        return np.mean(speeds), np.mean(angles)
+        return np.mean(speeds), np.mean(angles), np.mean([val * (1 / dt) for val in deltas])
         # return median
 
     def getFirstFrameIndex(self):
