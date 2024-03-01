@@ -1,5 +1,5 @@
 # disc-metrics
-
+This program uses computer vision to automatically calculate speed, angle, and body position using nothing but a video of a throw. Speed is directly correlated with distance, one of the most sought after skills in disc golf, so having an accurate way to measure speed is super helpful in nailing down what works and what doesn't when making form changes. However, other than expensive equipment such as a radar gun or TechDisc, there really don't exist any tools to easily measure the speed of a throw.
 
 ## Determine distance from camera automatically via known radius of disc
 ![](https://github.com/DiscMetrics/disc-metrics/blob/examples/data/disc_metrics_circles-cropped-2.gif)
